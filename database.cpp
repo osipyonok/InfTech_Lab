@@ -40,11 +40,14 @@ DataBase::DataBase(QJsonObject obj)
 bool DataBase::createTable(QString _name , vector<DataTypes> _description , vector<QString> _field_names)
 {
     if(is_auth == false){
-        addMessage(Error , "Необхiдно авторизуватися.");
+    //    addMessage(Error , "Необхiдно авторизуватися.");
         return false;
     }
     if(used_names.find(_name) != used_names.end()){
-        addMessage(Error , "Таблиця з такою назвою вже icнує.");
+    //    addMessage(Error , "Таблиця з такою назвою вже icнує.");
+        return false;
+    }
+    if(_description.size() != _field_names.size() or _field_names.size() == 0){
         return false;
     }
     try{
@@ -52,7 +55,8 @@ bool DataBase::createTable(QString _name , vector<DataTypes> _description , vect
         tables.push_back(table);
         active_table = tables.size() - 1;
         used_names.insert(_name);
-        addMessage(Information , "Таблиця створена.");
+    //    addMessage(Information , "Таблиця створена.");
+        return true;
     }catch(...){}
 }
 

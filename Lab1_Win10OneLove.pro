@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += widgets
+QT       += testlib
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -37,7 +38,10 @@ SOURCES += \
     messagestack.cpp \
     createdatabase.cpp \
     projectiontable.cpp \
-    intersection.cpp
+    intersection.cpp \
+    test_datatypes.cpp \
+    test_create_table.cpp \
+    test_intersection.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -53,7 +57,10 @@ HEADERS += \
     messagestack.h \
     createdatabase.h \
     projectiontable.h \
-    intersection.h
+    intersection.h \
+    test_datatypes.h \
+    test_create_table.h \
+    test_intersection.h
 
 FORMS += \
         mainwindow.ui \

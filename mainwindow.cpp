@@ -13,6 +13,11 @@
 #include<dataviewer.h>
 #include <QWidget>
 #include <createdatabase.h>
+#include <test_datatypes.h>
+#include <test_create_table.h>
+#include <test_intersection.h>
+
+#define UNIT_TEST {Test_datatypes test1; Test_create_table test2; Test_intersection test3;}
 
 using namespace std;
 
@@ -25,7 +30,11 @@ MainWindow::MainWindow(QWidget *parent) :
  //   run();
     ui->setupUi(this);
     this->setWindowFlag(Qt::MSWindowsFixedSizeDialogHint);
-
+    UNIT_TEST
+//    Test_datatypes test1;
+//    test_create_table test2;
+//    QString str("EeE");
+//    QCOMPARE(str.toLower(), QString("eee"));
 }
 
 void run(){//DEBUG //https://creately.com/app/?tempID=h165rwt81&login_type=demo#

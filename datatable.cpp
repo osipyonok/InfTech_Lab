@@ -101,7 +101,6 @@ pair<bool , DataTypes> DataTable::getDataType(int index){
 
 bool DataTable::addRow(vector<pair<int , QString>> data){
     vector<DataTypes> used_datatypes;
-    qDebug() << "allo qqq\n";
     if(validate(this , description , data , used_datatypes) == false){
     //    qDebug() << "Suck\n";
         return false;
