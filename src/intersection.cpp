@@ -45,6 +45,7 @@ Intersection::~Intersection()
 void Intersection::on_buttonBox_clicked(QAbstractButton *button)
 {
     if(button->text() == "OK"){
+        qDebug() << button->text() << endl;
         vector<QString> v = {this->curTable};
         for(int i = 0 ; i < ui->possibleTables->rowCount() ; ++i){
             if(qobject_cast<QCheckBox *>(ui->possibleTables->cellWidget(i , 1)->
@@ -54,6 +55,8 @@ void Intersection::on_buttonBox_clicked(QAbstractButton *button)
         }
         this->result_table = this->db->Intersect(v);
         this->result = true;
+    }else{
+        this->result = false;
     }
 }
 

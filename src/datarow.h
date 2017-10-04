@@ -9,6 +9,7 @@
 
 using namespace std;
 
+
 class DataRow : MessageStack
 {
 private:
@@ -36,12 +37,12 @@ private:
             return json;
         }
     };
-
     bool is_sorted;
     vector<pair<int , Value>> data;
     void sortData();
 public:
     DataRow(vector<DataTypes> & , vector<pair<int , QString>> &);
+    DataRow(DataRow , set<int>);
     DataRow(QJsonObject obj);
     QJsonValue toJson();
     void save(QString &);

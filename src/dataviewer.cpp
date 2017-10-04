@@ -13,7 +13,6 @@ DataViewer::DataViewer(QJsonObject obj , QString path , QString login , QString 
     this->db = DataBase(obj);
     this->db.authentication(login , pass);
     this->dbPath = path;
-    qDebug() << db.tables.size() << endl;
     ui->setupUi(this);
     QStringList *stringList = new QStringList();
     stringList->append("Головна панель");
@@ -104,7 +103,7 @@ void DataViewer::ShowTable(QString name){
         ui->deleteTableButton->setVisible(true);
         ui->deleteRowButton->setVisible(true);
         ui->addRowButton->setVisible(true);
-        ui->makeProjection->setVisible(true);
+    //    ui->makeProjection->setVisible(true);
         ui->IntersectionButton->setVisible(true);
         ui->tableWidget->show();
     }
@@ -262,6 +261,7 @@ void DataViewer::on_IntersectionButton_clicked()
     Intersection intersection(ui->dbTable , &this->db , last_table);
     intersection.exec();
     if(intersection.getResult()){
+        qDebug() << "retretetete\n";
         ShowTable(intersection.getResultTable());
     }
 }

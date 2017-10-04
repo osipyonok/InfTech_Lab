@@ -1,6 +1,6 @@
-#include "test_intersection.h"
+#include "test_projection.h"
 
-Test_intersection::Test_intersection()
+Test_projection::Test_projection()
 {
     DataBase db("test_db" , "login" , "pass");
 
@@ -30,39 +30,36 @@ Test_intersection::Test_intersection()
     db.addRow({{0 , "2"} , {1 , "2.81"} , {2 , "C"} , {3 , "[file2.txt;bbbb]"}} , "NewTable5");
     db.addRow({{0 , "3"} , {1 , "5.0505"} , {2 , "D"} , {3 , "[file3.txt;cbcb]"}} , "NewTable5");
 
-    vector<pair<vector<QString> , int>> tests = {
-        {{"NewTable1" , "NewTable2"} , 1},
-        {{"NewTable1" , "NewTable3"} , 0},
-        {{"NewTable1" , "NewTable4"} , 0},
-        {{"NewTable3" , "NewTable4"} , 3},
-        {{"NewTable3" , "NewTable4" , "NewTable5"} , 2},
-        {{"NewTable3" , "NewTable4" , "NewTable5" , "NewTable2"} , 0},
-        {{"NewTable3" , "NewTable5"} , 2}
+    vector<pair<pair<QString , vector<QString>> , vector<QString>>> tests = {
+        {{"NewTable1" , {"ID"}} , {"ID"}},
+        {{"NewTable4" , {"id" , "value" , "txtfile"}} , {"id" , "value" , "txtfile"}},
+        {{"NewTable2" , {"NAME" , "ID"}} , {"ID" , "NAME"}},
+        {{"NewTable5" , {"ide"}} , {}},
+        {{"NewTable1" , {"ID"}} , {"ID"}}
     };
-
-    for(auto test : tests){
-        auto tbls = test.first;
-        auto cnt = test.second;
-        auto intersection = db.Intersect(tbls);
-        printTest(intersection.getRows().size() == cnt , tbls , intersection);
+    for(auto & test : tests){
+        DataTable tbl = db.getDataTable(test.first.first);
+        auto fields = test.first.second;
+        auto res = test.second;
+        DataTable projected = DataTable::Project(tbl , fields);
+        bool verdict = res.size() == projected.getDescription().size();
+        set<QString> st;for(auto & e : res)st.insert(e);
+        for(auto & e : projected.getFieldNames())verdict &= st.find(e.second) != st.end();
+        printTest(verdict , projected , res);
     }
 }
 
-void Test_intersection::printTest(bool verdict , vector<QString> tbls, DataTable result){
+void Test_projection::printTest(bool verdict , DataTable tbl , vector<QString> res){
     qDebug() << "------------------------------------------------------------" << endl;
     qDebug() << "Verdict " << (verdict ? "Passed" : "Failed") << endl;
-    qDebug() << "Tables: " << endl;
-    for(auto & e : tbls)qDebug() << e << " ";qDebug() << endl;
-    qDebug() << "Got " << result.getRows().size() << " rows" << endl;
-    if(result.getRows().size()){
-        qDebug() << "Intersection is: " << endl;
-        vector<DataRow> rows = result.getRows();
-        for(DataRow row : rows){
-            QString cur = "";
-            for(auto e : row.getData()){
-                cur += to_string(e.second.type) + ": " +  e.second.value + "    ";
-            }
-            qDebug() << "           " << cur << endl;
-        }
+    if(verdict){
+        qDebug() << "Got " << res.size() << " cols." << endl;
+    }else{
+        QString got = "";
+        for(auto & e : tbl.getFieldNames())got += e.second + " ";
+        qDebug() << "Got " << got << endl;
+        QString exp = "";
+        for(auto & e : res)exp += e + " ";
+        qDebug() << "Expected " << exp << endl;
     }
 }

@@ -17,11 +17,10 @@ private:
 
     bool is_auth = false;
     set<QString> used_names;
-
-
-public:
     vector<DataTable> tables;
     int active_table = -1;
+
+public:
     DataBase(QString , QString , QString);
     DataBase(QJsonObject);
     DataBase();

@@ -24,6 +24,15 @@ DataRow::DataRow(QJsonObject obj){
     is_sorted = false;
 }
 
+DataRow::DataRow(DataRow other , set<int> projection){
+    for(auto & e : other.data){
+        if(projection.find(e.first) != projection.end()){
+            this->data.push_back(e);
+        }
+    }
+    is_sorted = false;
+}
+
 QJsonValue DataRow::toJson()
 {
     QJsonObject obj;

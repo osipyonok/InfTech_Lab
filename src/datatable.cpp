@@ -192,14 +192,18 @@ DataTable DataTable::Intersect(vector<DataTable> v){
     res.description = v[0].description;
     res.field_names = v[0].field_names;
     vector<DataRow> rws = v[0].getRows();
-    vector<bool> was(rws.size() , 1);
+    vector<bool> was(rws.size() , 1); //was[i] = true  <=> i-th row appears at least once in each table
+    vector<vector<bool>> used(v.size() , vector<bool>(rws.size() , false));// used[i][j] = 1 <=> this row have already been included
     for(int i = 0 ; i < rws.size() ; ++i){
-        for(int j = 1 ; j < v.size() ; ++j){
+        for(int j = 0 ; j < v.size() ; ++j){
             auto tmp = v[j].getRows();
             bool ck = 0;
-            for(auto &o : tmp){
-                if(o == rws[i]){
-                    ck = 1;
+            for(int k = 0 ; k < tmp.size() ; ++k){
+                if(tmp[k] == rws[i]){
+                    if(used[j][k] == 0){
+                        ck = true;
+                    }
+                    used[j][k] = true;
                 }
             }
             if(ck == 0)was[i] = 0;
@@ -207,6 +211,41 @@ DataTable DataTable::Intersect(vector<DataTable> v){
         if(was[i]){
             res.rows.push_back(rws[i]);
         }
+    }
+    return res;
+}
+
+DataTable DataTable::Project(DataTable table , vector<QString> _cols){
+    DataTable res;
+    res.name = "Projection";
+    set<QString> cols;
+    for(auto & e : _cols)cols.insert(e);
+    sort(table.field_names.begin() , table.field_names.end());
+    map<QString , int> mp;
+    for(auto & e : table.field_names)mp[e.second] = e.first;
+    set<int> need;
+    for(auto & e : _cols){ if(mp.find(e) != mp.end())need.insert(mp[e]);}
+    if(need.size() == 0)return res;
+    for(DataRow & row : res.rows){
+        res.rows.push_back(DataRow(row , need));
+    }
+    for(auto & e : _cols){
+        if(mp.find(e) != mp.end())res.field_names.push_back({mp[e] , e});
+    }
+    table.sortDescription();
+    auto desc = table.getDescription();
+    for(auto & e : res.field_names){
+        int idx = e.first;
+        int l = 0  , r = desc.size();
+        while(r - l > 1){
+            int mid = (r + l) / 2;
+            if(desc[mid].first > idx){
+                r = mid;
+            }else{
+                l = mid;
+            }
+        }
+        res.description.push_back(desc[l]);
     }
     return res;
 }
