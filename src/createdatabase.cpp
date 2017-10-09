@@ -16,6 +16,7 @@ CreateDataBase::~CreateDataBase()
 
 void CreateDataBase::on_buttonBox_clicked(QAbstractButton *button)
 {
+    res = false;
     if(button->text() == "OK"){
         res = ui->dbName->text().length() > 0;
         dbName = ui->dbName->text();
