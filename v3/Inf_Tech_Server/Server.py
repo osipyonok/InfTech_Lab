@@ -6,17 +6,18 @@ import json
 
 
 class ClientThread(Thread):
-    def __init__(self, ip, port, used_db_ref):
+    def __init__(self, ip, port, used_db_ref, conn):
         Thread.__init__(self)
         self.ip = ip
         self.port = port
         self.used_tables = used_db_ref
         self.connection = DataBaseConnection(self.used_tables)
+        self.conn = conn
 
     def run(self):
         while True:
             try:
-                data = conn.recv(1024)
+                data = self.conn.recv(1024)
                 try:
                     obj = dict(json.loads(data))
                 except:
@@ -40,10 +41,11 @@ class ClientThread(Thread):
                     elif command == "closeDataBase":
                         self.connection.close()
                 print("Send", response, "to", self.getName())
-                conn.send(response)
+                self.conn.send(response)
             except ConnectionResetError:
                 self.connection.close()
                 break
+        self.conn.close()
 
 
 
@@ -59,11 +61,10 @@ threads = []
 
 used_tables = ref(set())
 
+tcpServer.listen(4)
 while True:
-    tcpServer.listen(4)
-    print("Set", used_tables.get())
     (conn, (ip, port)) = tcpServer.accept()
-    newthread = ClientThread(ip, port, used_tables)
+    newthread = ClientThread(ip, port, used_tables, conn)
     newthread.start()
     threads.append(newthread)
 
