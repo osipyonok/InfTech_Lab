@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Inf tech Lab</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link rel="stylesheet" href="http://silviomoreto.github.io/bootstrap-select/dist/css/bootstrap-select.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <style>
+            table {
+                font-family: arial, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+            }
+            td, th {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
+            tr:nth-child(even) {
+                background-color: #dddddd;
+            }
+        </style>
+        <script language="JavaScript">
+            function getFormatedValue(val, type){
+                if(type == "String"){
+                    return val;
+                }else if(type == "Int"){
+                    return val;
+                }else if(type == "Real"){
+                    return val;
+                }else if(type == "Char"){
+                    return val;
+                }else if(type == "Range"){
+                    var pos = val.search(';');
+                    var fi = val.substr(1, pos - 1);
+                    val = val.substr(pos + 1);
+                    pos = val.search(';');
+                    var se = val.substr(0, pos);
+                    val = val.substr(pos + 1);
+                    pos = val.search(']');
+                    var st = val.substr(0, pos);
+                    return 'Початок: ' + fi + ', кінець: ' + se + ', крок: ' + st;
+                }else if(type == "Txtfile"){
+                    var pos = val.search(';');
+                    var name = val.substr(1, pos - 1);
+                    val = val.substr(pos + 1);
+                    pos = val.search(']');
+                    var content = val.substr(0, pos);
+                    var ans = 'Файл не вибрано';
+                    var httpRequest = new XMLHttpRequest();
+                    httpRequest.open('GET', "../save_txt_file?name=" + name + "&content=" + encodeURI(content), false);
+                    httpRequest.send();
+                    if(httpRequest.status === 200)
+                        return '<a href="../' + httpRequest.responseText + '" download="../' + httpRequest.responseText + '">' + name + '</a>';
+                }
+            }
+
+            var disp_arr = [];
+
+            function changeDisplay(col, table){
+                var pos = $.inArray(col, disp_arr);
+                if(pos > -1){
+                    disp_arr.splice(pos, 1);
+                }else{
+                    disp_arr.push(col);
+                }
+                showTable(table, disp_arr);
+                //alert(col + " " + table);
+            }
+
+            function showTable(table, display){
+                table_name = table;
+                $.getJSON("../get_table?name=" + table + "&display=" + display, function(result){
+                    var obj = result['showTable'];
+                    if(obj['Result']){
+                        var table = obj['Table'];
+                        var rows = table['rows'];
+                        var names = table['field_names'];
+                        var code = "<center><h1>Таблиця {{name}}</h1></center><table style='width:80%; float:left; margin-right:25px;'><tr>";
+                        var hidden_cols = [];
+                        for(var key in names){
+                            if(display === 'all' && $.inArray(names[key], disp_arr) === -1){
+                                disp_arr.push(names[key]);
+                            }
+                            if(display !== 'all' && $.inArray(names[key], disp_arr) === -1){
+                                hidden_cols.push(key);
+                                continue;
+                            }
+                            code += "<td>" + names[key] + "</td>";
+                        }
+                        code += "</tr>";
+                        //alert("hidden cols" + hidden_cols);
+                        for(var key in rows){
+                            var row = rows[key];
+                            code += "<tr>";
+                            for(var ck in row){
+                                if($.inArray(ck, hidden_cols) > -1)continue;
+                                code += "<td>" + getFormatedValue(row[ck]["value"], row[ck]["type"]) + "</td>";
+                            }
+                            code += "</tr>";
+                        }
+                        code += "</table>";
+                        code += "<table style='width:15%; '><tr><td>Проекція</td></tr>";
+                        for(var key in names){
+                            var cbox = "<input onclick=\"changeDisplay('" + names[key] + "', '" + table_name + "');\" style='margin-right:8px;' type='checkbox' " + ($.inArray(names[key], disp_arr) > -1 ? "checked" : "") + ">" + names[key];
+                            code += "<tr><td>" + cbox + "</td></tr>";
+                        }
+                        code += "</table>";
+                        $('#table').html(code);
+                    }
+                });
+            }
+        </script>
+    </head>
+	<body>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Cloud lab</a>
+                </div>
+                <ul class="nav navbar-nav">
+                    {% for tbl in tables %}
+                    <li {% if tbl == name %}class="active"{% endif %}><a href="../db?name={{tbl}}">{{tbl}}</a></li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+        </nav>
+        <script>showTable('{{name}}', 'all');</script>
+        <div id="table" style="margin: auto; width:80%; padding-top: 6%;">
+
+        </div>
+        <div id="aa"></div>
+    </body>
+</html>
