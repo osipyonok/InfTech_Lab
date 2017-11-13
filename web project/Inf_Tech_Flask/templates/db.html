@@ -58,15 +58,18 @@
 
             var disp_arr = [];
 
-            function changeDisplay(col, table){
+            function changeDisplay(col, table, cb){
                 var pos = $.inArray(col, disp_arr);
                 if(pos > -1){
+                    if(disp_arr.length == 1){
+                        cb.checked = true;
+                        return false;
+                    }
                     disp_arr.splice(pos, 1);
                 }else{
                     disp_arr.push(col);
                 }
                 showTable(table, disp_arr);
-                //alert(col + " " + table);
             }
 
             function showTable(table, display){
@@ -103,7 +106,7 @@
                         code += "</table>";
                         code += "<table style='width:15%; '><tr><td>Проекція</td></tr>";
                         for(var key in names){
-                            var cbox = "<input onclick=\"changeDisplay('" + names[key] + "', '" + table_name + "');\" style='margin-right:8px;' type='checkbox' " + ($.inArray(names[key], disp_arr) > -1 ? "checked" : "") + ">" + names[key];
+                            var cbox = "<input onclick=\"changeDisplay('" + names[key] + "', '" + table_name + "', this);\" style='margin-right:8px;' type='checkbox' " + ($.inArray(names[key], disp_arr) > -1 ? "checked" : "") + ">" + names[key];
                             code += "<tr><td>" + cbox + "</td></tr>";
                         }
                         code += "</table>";
